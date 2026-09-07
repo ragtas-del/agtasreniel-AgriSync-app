@@ -11,7 +11,7 @@ import {
   IconCloudOk,
   IconExpense,
   IconFarmers,
-  IconInvest,
+  IconCashAdvance,
   IconPlus,
   IconSync,
 } from '../components/icons'
@@ -128,8 +128,8 @@ export default function Dashboard() {
         <Stat
           label="Outstanding"
           value={fmtMoney(m.outstanding)}
-          note={`${m.activeInvestments} active investments`}
-          icon={<IconInvest width={14} height={14} />}
+          note={`${m.activeCashAdvances} active cash advances`}
+          icon={<IconCashAdvance width={14} height={14} />}
         />
         <Stat
           label="Pending sync"
@@ -183,8 +183,8 @@ export default function Dashboard() {
                           ? 'Farm profile'
                           : o.entity === 'visit'
                             ? 'Field visit'
-                            : o.entity === 'investment'
-                          ? 'Investment record'
+                            : o.entity === 'cashAdvance'
+                          ? 'Cash advance record'
                           : o.entity === 'expense'
                             ? 'Farm expense'
                             : 'Plot record'}{' '}
@@ -200,7 +200,7 @@ export default function Dashboard() {
         </>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }} className="mt-5">
+      <div className="quick-grid mt-5">
         <Link to="/farmers" className="card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ display: 'grid' }}><Avatar initials="FV" size={40} /></span>
           <span className="grow">
@@ -209,11 +209,11 @@ export default function Dashboard() {
           </span>
           <IconArrowRight width={17} height={17} style={{ color: 'var(--muted)' }} />
         </Link>
-        <Link to="/investments" className="card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ display: 'grid' }}><span className="avatar" style={{ background: 'linear-gradient(150deg,#d99a2b,#c78a1f)' }}><IconInvest width={19} height={19} /></span></span>
+        <Link to="/cash-advances" className="card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ display: 'grid' }}><span className="avatar" style={{ background: 'linear-gradient(150deg,#d99a2b,#c78a1f)' }}><IconCashAdvance width={19} height={19} /></span></span>
           <span className="grow">
-            <span className="row-title" style={{ fontSize: 14 }}>Investments</span>
-            <span className="row-sub d-block">Portfolio & repayments</span>
+            <span className="row-title" style={{ fontSize: 14 }}>Cash Advances</span>
+            <span className="row-sub d-block">Portfolio & repayment tracking</span>
           </span>
           <IconArrowRight width={17} height={17} style={{ color: 'var(--muted)' }} />
         </Link>

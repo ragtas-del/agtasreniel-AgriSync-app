@@ -1,60 +1,60 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { useAppState } from '../data/store'
-import { addFarmerMessage, addRepayment, createInvestment, notifyFarmer, sendInvestmentEmail, totalRepaid } from '../data/repository'
+import { addFarmerMessage, addRepayment, createCashAdvance, notifyFarmer, sendCashAdvanceEmail, totalRepaid } from '../data/repository'
 import { fmtDate, fmtMoney, fmtRelative } from '../data/format'
 import { Chip, Field, Meta, Modal, toast, Button, Seg } from '../components/kit'
-import { IconInvest, IconPlus, IconSend, IconBell, IconPhone, IconMail } from '../components/icons'
+import { IconCashAdvance, IconPlus, IconSend, IconBell, IconPhone, IconMail } from '../components/icons'
 import { CHANNELS } from '../data/sync'
 import { mailConfigured } from '../data/mail'
-import { investmentEmailDraft } from '../data/emailDraft'
+import { cashAdvanceEmailDraft } from '../data/emailDraft'
 import { ussdCode } from '../data/util'
-import type { Farmer, Investment } from '../domain/types'
+import type { Farmer, CashAdvance } from '../domain/types'
 
-function statusTone(status: Investment['status']): string {
+function statusTone(status: CashAdvance['status']): string {
   return status === 'overdue' ? 'tone-red' : status === 'repaid' ? 'tone-green' : status === 'defaulted' ? 'tone-red' : 'tone-blue'
 }
 
-export default function Investments() {
+export default function CashAdvances() {
   const db = useAppState((s) => s.db)
   const online = useAppState((s) => s.online)
   const [showNew, setShowNew] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
 
-  const investments = [...db.investments].sort((a, b) => b.disbursedDate.localeCompare(a.disbursedDate))
-  const totalDisbursed = investments.reduce((s, i) => s + i.principal, 0)
-  const totalRepaidSum = investments.reduce((s, i) => s + totalRepaid(i), 0)
-  const outstanding = investments.reduce(
+  const cashAdvances = [...db.cashAdvances].sort((a, b) => b.disbursedDate.localeCompare(a.disbursedDate))
+  const totalDisbursed = cashAdvances.reduce((s, i) => s + i.principal, 0)
+  const totalRepaidSum = cashAdvances.reduce((s, i) => s + totalRepaid(i), 0)
+  const outstanding = cashAdvances.reduce(
     (s, i) => s + (i.status === 'active' || i.status === 'overdue' ? i.principal - totalRepaid(i) : 0),
     0,
   )
-  const active = investments.filter((i) => i.status === 'active' || i.status === 'overdue').length
+  const active = cashAdvances.filter((i) => i.status === 'active' || i.status === 'overdue').length
 
   return (
     <>
       <div className="page-header">
         <div>
           <div className="crumb">Financial inclusion portfolio</div>
-          <h1 className="mt-2">Investments</h1>
+          <h1 className="mt-2">Cash Advances</h1>
         </div>
         <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}>
-          <IconPlus width={16} height={16} /> New investment
+          <IconPlus width={16} height={16} /> New cash advance
         </button>
       </div>
 
       <div className="stat-grid">
-        <Stat label="Disbursed" value={fmtMoney(totalDisbursed)} sub={`${investments.length} records`} />
+        <Stat label="Disbursed" value={fmtMoney(totalDisbursed)} sub={`${cashAdvances.length} records`} />
         <Stat label="Repaid" value={fmtMoney(totalRepaidSum)} sub={`${Math.round((totalRepaidSum / Math.max(1, totalDisbursed)) * 100)}% recovery`} />
         <Stat label="Outstanding" value={fmtMoney(outstanding)} sub={`${active} active`} />
-        <Stat label="At risk" value={investments.filter((i) => i.status === 'overdue' || i.status === 'defaulted').length} sub="overdue / defaulted" />
+        <Stat label="At risk" value={cashAdvances.filter((i) => i.status === 'overdue' || i.status === 'defaulted').length} sub="overdue / defaulted" />
       </div>
 
       <div className="seg-title mt-5">Portfolio</div>
 
       <section className="card">
-        {investments.length === 0 ? (
-          <p className="text-sm text-mute">No investment records yet.</p>
+        {cashAdvances.length === 0 ? (
+          <p className="text-sm text-mute">No cash advance records yet.</p>
         ) : (
-          investments.map((inv) => {
+          cashAdvances.map((inv) => {
             const farmer = db.farmers.find((f) => f.id === inv.farmerId)
             const repaid = totalRepaid(inv)
             const pct = Math.min(100, Math.round((repaid / Math.max(1, inv.principal)) * 100))
@@ -63,7 +63,7 @@ export default function Investments() {
               <div key={inv.id}>
                 <div className="row-link" style={{ cursor: 'pointer' }} onClick={() => setExpanded(open ? null : inv.id)}>
                   <span className="avatar" style={{ background: 'linear-gradient(150deg,#d99a2b,#c78a1f)', width: 40, height: 40 }}>
-                    <IconInvest width={18} height={18} />
+                    <IconCashAdvance width={18} height={18} />
                   </span>
                   <div className="row-main">
                     <div className="row-title">{inv.label}</div>
@@ -86,12 +86,12 @@ export default function Investments() {
         )}
       </section>
 
-      <NewInvestmentModal open={showNew} onClose={() => setShowNew(false)} online={online} />
+      <NewCashAdvanceModal open={showNew} onClose={() => setShowNew(false)} online={online} />
     </>
   )
 }
 
-function RepaymentPanel({ inv }: { inv: Investment }) {
+function RepaymentPanel({ inv }: { inv: CashAdvance }) {
   const online = useAppState((s) => s.online)
   const farmer = useAppState((s) => s.db.farmers.find((f) => f.id === inv.farmerId))
   const mailCfg = useAppState((s) => s.settings.mail)
@@ -108,7 +108,7 @@ function RepaymentPanel({ inv }: { inv: Investment }) {
   const draft =
     smsText ??
     (farmer ? smsDraft(inv, farmer, ussdCode(inv.id)) : '')
-  const emailDraftText = farmer ? investmentEmailDraft(inv, farmer) : { subject: '', body: '' }
+  const emailDraftText = farmer ? cashAdvanceEmailDraft(inv, farmer) : { subject: '', body: '' }
   const subject = emailSubject ?? emailDraftText.subject
   const body = emailBody ?? emailDraftText.body
 
@@ -140,7 +140,7 @@ function RepaymentPanel({ inv }: { inv: Investment }) {
       toast('Add an email on the farmer profile first', 'alert')
       return
     }
-    const rec = sendInvestmentEmail(inv.id, farmer.email, subject, body)
+    const rec = sendCashAdvanceEmail(inv.id, farmer.email, subject, body)
     if (rec) {
       toast(
         online
@@ -276,11 +276,11 @@ function RepaymentPanel({ inv }: { inv: Investment }) {
         <p className="text-xs text-mute">No contact number on file for this farmer.</p>
       )}
 
-      <Seg icon={<IconMail width={13} height={13} />} style={{ marginTop: 14 }}>Email investment updates</Seg>
+      <Seg icon={<IconMail width={13} height={13} />} style={{ marginTop: 14 }}>Email cash advance updates</Seg>
       {farmer?.email ? (
         <>
           <p className="text-xs text-mute">
-            Email {farmer.name.split(' ')[0]} a written investment update to{' '}
+            Email {farmer.name.split(' ')[0]} a written cash advance update to{' '}
             <span className="mono" style={{ fontWeight: 600 }}>{farmer.email}</span> —{' '}
             {mailReady
               ? 'delivered to their Gmail inbox when you sync.'
@@ -355,7 +355,7 @@ function openMailApp(to: string, subject: string, body: string): void {
   window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
-function smsDraft(inv: Investment, farmer: Farmer, code: string): string {
+function smsDraft(inv: CashAdvance, farmer: Farmer, code: string): string {
   const pct = Math.min(100, Math.round((totalRepaid(inv) / Math.max(1, inv.principal)) * 100))
   return `AgriLedger: ${farmer.name.split(' ')[0]}, your "${inv.label}" — ${fmtMoney(inv.principal)} total, ${pct}% paid back, due ${fmtDate(inv.dueDate)}. Dial ${code} on your phone to check.`
 }
@@ -370,7 +370,7 @@ function Stat({ label, value, sub }: { label: string; value: ReactNode; sub: str
   )
 }
 
-function NewInvestmentModal({ open, onClose, online }: { open: boolean; onClose: () => void; online: boolean }) {
+function NewCashAdvanceModal({ open, onClose, online }: { open: boolean; onClose: () => void; online: boolean }) {
   const db = useAppState((s) => s.db)
   const [farmerId, setFarmerId] = useState('')
   const [kind, setKind] = useState('microloan')
@@ -392,7 +392,7 @@ function NewInvestmentModal({ open, onClose, online }: { open: boolean; onClose:
       toast('Enter a valid amount', 'alert')
       return
     }
-    createInvestment({
+    createCashAdvance({
       farmerId: f.id,
       kind: kind as 'microloan' | 'equipment' | 'inputs-financing' | 'grant',
       label: label.trim() || `${kind} for ${f.name.split(' ')[0]}`,
@@ -402,13 +402,13 @@ function NewInvestmentModal({ open, onClose, online }: { open: boolean; onClose:
       dueDate: dueDate ? new Date(dueDate).toISOString() : new Date(Date.now() + 180 * 86400000).toISOString(),
       initialMessage,
     })
-    toast(online ? 'Investment queued via USSD gateway' : 'Investment saved on device — syncs later', online ? 'ok' : 'alert')
+    toast(online ? 'Cash advance queued via USSD gateway' : 'Cash advance saved on device — syncs later', online ? 'ok' : 'alert')
     onClose()
     setFarmerId(''); setLabel(''); setPrincipal(''); setRate('12'); setDueDate(''); setInitialMessage('')
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="New investment">
+    <Modal open={open} onClose={onClose} title="New cash advance">
       <form onSubmit={submit}>
         <Field label="Farmer">
           <select className="select" value={farmerId} onChange={(e) => setFarmerId(e.target.value)}>
@@ -452,7 +452,7 @@ function NewInvestmentModal({ open, onClose, online }: { open: boolean; onClose:
           />
         </Field>
         <div className="flex gap-md mt-4">
-          <Button type="submit" block>Queue investment</Button>
+          <Button type="submit" block>Queue cash advance</Button>
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
         </div>
       </form>

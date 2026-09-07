@@ -65,12 +65,12 @@ export default function FarmerDetail() {
   const visits = db.visits
     .filter((v) => v.farmerId === f.id)
     .sort((a, b) => b.date.localeCompare(a.date))
-  const investments = db.investments.filter((i) => i.farmerId === f.id)
+  const cashAdvances = db.cashAdvances.filter((i) => i.farmerId === f.id)
   const expenses = db.expenses
     .filter((e) => e.farmerId === f.id)
     .sort((a, b) => b.date.localeCompare(a.date))
   const expensesTotal = expenses.reduce((s, e) => s + e.amount, 0)
-  const outstanding = investments.reduce(
+  const outstanding = cashAdvances.reduce(
     (sum, i) => sum + (i.status === 'active' || i.status === 'overdue' ? i.principal - totalRepaid(i) : 0),
     0,
   )
@@ -131,7 +131,7 @@ export default function FarmerDetail() {
           <button
             className="btn btn-danger-ghost btn-sm"
             onClick={() =>
-              confirmDialog(`Delete ${f.name}?`, `${f.village} and her plots, visits and investment records will be removed from your device and queued for deletion on the central server.`, () => {
+              confirmDialog(`Delete ${f.name}?`, `${f.village} and her plots, visits and cash advance records will be removed from your device and queued for deletion on the central server.`, () => {
                 deleteFarmer(f.id)
                 toast(online ? `Farmer deletion queued via ${CHANNELS['sms-gateway'].short}` : 'Farmer deleted — saves when reconnected', online ? 'ok' : 'alert')
                 nav('/farmers')
@@ -180,7 +180,7 @@ export default function FarmerDetail() {
               ['Municipality', f.district],
               ['Plots', String(plots.length)],
               ['Visits logged', String(visits.length)],
-              ['Outstanding investment', fmtMoney(outstanding)],
+              ['Outstanding cash advance', fmtMoney(outstanding)],
               ['Farm expenses', fmtMoney(expensesTotal)],
             ]}
           />
@@ -369,15 +369,15 @@ export default function FarmerDetail() {
         </button>
       </div>
 
-      <Seg>Investments</Seg>
+      <Seg>Cash Advances</Seg>
       <section className="card">
-        {investments.length === 0 ? (
-          <p className="text-sm text-mute">No investment records — open the Investments tab to add one.</p>
+        {cashAdvances.length === 0 ? (
+          <p className="text-sm text-mute">No cash advances yet — open the Cash Advances tab to add one.</p>
         ) : (
-          investments.map((inv) => {
+          cashAdvances.map((inv) => {
             const pct = Math.min(100, Math.round((totalRepaid(inv) / Math.max(1, inv.principal)) * 100))
             return (
-              <Link to="/investments" key={inv.id} className="row-link">
+              <Link to="/cash-advances" key={inv.id} className="row-link">
                 <span className="avatar" style={{ background: 'linear-gradient(150deg,#d99a2b,#c78a1f)', width: 38, height: 38 }}>
                   <IconLeaf width={16} height={16} />
                 </span>

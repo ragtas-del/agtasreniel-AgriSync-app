@@ -1,7 +1,7 @@
 import { useAppState } from '../data/store'
 import {
   healthCounts,
-  investmentMix,
+  cashAdvanceMix,
   plotYieldByCrop,
   portfolioTrend,
   riskCounts,
@@ -20,7 +20,7 @@ export default function Analytics() {
   const risk = riskCounts(db)
   const weeks = visitsPerWeek(db)
   const portfolio = portfolioTrend(db)
-  const mix = investmentMix(db)
+  const mix = cashAdvanceMix(db)
   const crops = plotYieldByCrop(db)
 
   return (
@@ -51,7 +51,7 @@ export default function Analytics() {
       <div className="split-layout mt-4">
         <div className="card">
           <div className="card-row">
-            <span className="card-title">Investment portfolio flow</span>
+            <span className="card-title">Cash advance flow</span>
           </div>
           <div className="chart-box" style={{ height: 230 }}><TrendLine data={portfolio} /></div>
         </div>

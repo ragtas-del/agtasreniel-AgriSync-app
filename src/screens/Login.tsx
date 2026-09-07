@@ -48,7 +48,7 @@ export default function Login() {
         </div>
 
         <h1 className="login-title">Farmer Administrator login</h1>
-        <p className="login-sub">Sign in to manage the farm ledger, investments, expenses and reports.</p>
+        <p className="login-sub">Sign in to manage the farm ledger, cash advances, expenses and reports.</p>
 
         <form onSubmit={handleSubmit} noValidate>
           <Field label="Username">

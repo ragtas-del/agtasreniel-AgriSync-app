@@ -620,7 +620,7 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0 14px;
 }
 
@@ -915,6 +915,20 @@
 }
 
 /* ============================================================
+   Dashboard quick links
+   ============================================================ */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .quick-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ============================================================
    Breakpoints: Mobile ≥320px (base) · Tablet ≥768px · Desktop ≥1024px
    ============================================================ */
 @media (min-width: 1024px) {
@@ -948,6 +962,9 @@
 @media (min-width: 768px) {
   .stat-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

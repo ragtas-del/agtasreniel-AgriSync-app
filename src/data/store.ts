@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { seed } from './seed'
-import type { AppSettings, AuthState, DB, OutboxItem, SyncLog, User } from '../domain/types'
+import type { AppSettings, AuthState, DB, OutboxItem, Repayment, SyncLog, User } from '../domain/types'
 
 const KEYS = {
   db: 'agriledger.db.v1',
@@ -80,6 +80,23 @@ let state: AppState = {
 }
 
 if (!state.db.expenses) state.db = { ...state.db, expenses: [] }
+
+const db = state.db as DB & { investments?: unknown }
+if (db.investments && !db.cashAdvances) {
+  state.db = {
+    ...state.db,
+    expenses: state.db.expenses,
+    cashAdvances: (db.investments as DB['cashAdvances']).map((i) => ({
+      ...i,
+      repayments: (i.repayments ?? []).map((r) => {
+        const { cashAdvanceId, investmentId, ...rest } = r as Repayment & { investmentId?: string }
+        return { ...rest, cashAdvanceId: cashAdvanceId ?? investmentId ?? i.id }
+      }),
+    })),
+  }
+  delete (state.db as DB & { investments?: unknown }).investments
+  save(KEYS.db, state.db)
+}
 
 const listeners = new Set<() => void>()
 

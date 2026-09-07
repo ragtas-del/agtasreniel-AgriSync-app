@@ -13,8 +13,8 @@ export function dashboardMetrics(db: DB, outbox: OutboxItem[], now = new Date())
   const weekAgo = now.getTime() - 7 * 24 * 3600 * 1000
   const visitsThisWeek = db.visits.filter((v) => new Date(v.date).getTime() >= weekAgo).length
   const overdueFollowUps = db.visits.filter((v) => v.followUpDate && isOverdue(v.followUpDate)).length
-  const activeInvestments = db.investments.filter((i) => i.status === 'active' || i.status === 'overdue')
-  const outstanding = activeInvestments.reduce(
+  const activeCashAdvances = db.cashAdvances.filter((i) => i.status === 'active' || i.status === 'overdue')
+  const outstanding = activeCashAdvances.reduce(
     (sum, i) => sum + (i.principal - totalRepaid(i)),
     0,
   )
@@ -24,7 +24,7 @@ export function dashboardMetrics(db: DB, outbox: OutboxItem[], now = new Date())
     farmers: db.farmers.length,
     visitsThisWeek,
     overdueFollowUps,
-    activeInvestments: activeInvestments.length,
+    activeCashAdvances: activeCashAdvances.length,
     outstanding,
     pendingSync,
     poorHealthPlots,
@@ -66,7 +66,7 @@ export function visitsPerWeek(db: DB, weeks = 8): { label: string; visits: numbe
   return buckets.map(({ visits, label }) => ({ visits, label }))
 }
 
-export function investmentMix(db: DB): { name: string; value: number }[] {
+export function cashAdvanceMix(db: DB): { name: string; value: number }[] {
   const kinds: Record<string, string> = {
     microloan: 'Microloans',
     equipment: 'Equipment',
@@ -74,7 +74,7 @@ export function investmentMix(db: DB): { name: string; value: number }[] {
     grant: 'Grants',
   }
   const sums = new Map<string, number>()
-  for (const inv of db.investments) {
+  for (const inv of db.cashAdvances) {
     sums.set(inv.kind, (sums.get(inv.kind) ?? 0) + inv.principal)
   }
   return [...sums.entries()].map(([k, v]) => ({ name: kinds[k] ?? k, value: v }))
@@ -82,7 +82,7 @@ export function investmentMix(db: DB): { name: string; value: number }[] {
 
 export function portfolioTrend(db: DB): PortfolioRow[] {
   const rows = new Map<string, PortfolioRow>()
-  for (const inv of db.investments) {
+  for (const inv of db.cashAdvances) {
     const m = monthKey(inv.disbursedDate)
     const row = rows.get(m) ?? { month: m, disbursed: 0, repaid: 0 }
     row.disbursed += inv.principal
@@ -118,7 +118,7 @@ export function statusCounts(db: DB): { name: string; value: number }[] {
     defaulted: 'Defaulted',
   }
   const counts = new Map<string, number>()
-  for (const inv of db.investments) {
+  for (const inv of db.cashAdvances) {
     counts.set(inv.status, (counts.get(inv.status) ?? 0) + 1)
   }
   return [...counts.entries()].map(([k, v]) => ({ name: labels[k] ?? k, value: v }))

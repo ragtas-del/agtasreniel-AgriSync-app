@@ -26,7 +26,7 @@ export const CHANNELS: Record<
   'ussd-gateway': {
     label: 'USSD Gateway',
     short: 'USSD',
-    desc: 'Investment records pushed through mobile money rails',
+    desc: 'Cash advance records pushed through mobile money rails',
     latency: [600, 1500],
     failRate: 0.08,
     tone: 'gold',
@@ -34,7 +34,7 @@ export const CHANNELS: Record<
   gmail: {
     label: 'Gmail',
     short: 'Gmail',
-    desc: 'Investment updates emailed to farmers via Gmail (EmailJS)',
+    desc: 'Cash advance updates emailed to farmers via Gmail (EmailJS)',
     latency: [500, 1400],
     failRate: 0.1,
     tone: 'brand',
@@ -62,7 +62,7 @@ function confirmEntity(item: OutboxItem, channel: ChannelId): void {
       farmers: item.entity === 'farmer' ? mark(db.farmers, { sourceChannel: channel } as Partial<DB['farmers'][number]>) : db.farmers,
       plots: db.plots,
       visits: db.visits,
-      investments: db.investments,
+      cashAdvances: db.cashAdvances,
       expenses: db.expenses,
     }
     return { db: next }

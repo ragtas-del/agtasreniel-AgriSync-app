@@ -9,7 +9,7 @@ import Farmers from './screens/Farmers'
 import FarmerDetail from './screens/FarmerDetail'
 import FarmerForm from './screens/FarmerForm'
 import NewVisit from './screens/NewVisit'
-import Investments from './screens/Investments'
+import CashAdvances from './screens/CashAdvances'
 import Expenses from './screens/Expenses'
 import Analytics from './screens/Analytics'
 import SyncCenter from './screens/SyncCenter'
@@ -26,7 +26,7 @@ function ProtectedApp() {
         <Route path="/farmers/:id" element={<FarmerDetail />} />
         <Route path="/farmers/:id/edit" element={<FarmerForm />} />
         <Route path="/farmers/:id/visit" element={<NewVisit />} />
-        <Route path="/investments" element={<Investments />} />
+        <Route path="/cash-advances" element={<CashAdvances />} />
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/sync" element={<SyncCenter />} />

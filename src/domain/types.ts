@@ -85,7 +85,7 @@ export interface Visit {
 
 export interface Repayment {
   id: ID
-  investmentId: ID
+  cashAdvanceId: ID
   date: string
   amount: number
   method: 'cash' | 'mobile-money' | 'auto-deduct' | 'bank-transfer'
@@ -112,7 +112,7 @@ export interface EmailRecord {
   body: string
 }
 
-export interface Investment {
+export interface CashAdvance {
   id: ID
   farmerId: ID
   kind: 'microloan' | 'equipment' | 'inputs-financing' | 'grant'
@@ -143,7 +143,7 @@ export type OutboxStatus = 'pending' | 'syncing' | 'synced' | 'failed'
 
 export interface OutboxItem {
   id: ID
-  entity: 'farmer' | 'plot' | 'visit' | 'investment' | 'expense' | 'sms' | 'email'
+  entity: 'farmer' | 'plot' | 'visit' | 'cashAdvance' | 'expense' | 'sms' | 'email'
   entityId: ID
   action: 'create' | 'update' | 'delete' | 'notify'
   payload: unknown
@@ -186,6 +186,6 @@ export interface DB {
   farmers: Farmer[]
   plots: Plot[]
   visits: Visit[]
-  investments: Investment[]
+  cashAdvances: CashAdvance[]
   expenses: Expense[]
 }

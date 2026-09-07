@@ -9,7 +9,7 @@ const ENTITY_LABEL: Record<OutboxItem['entity'], string> = {
   farmer: 'Farmer profile',
   plot: 'Plot record',
   visit: 'Field visit',
-  investment: 'Investment record',
+  cashAdvance: 'Cash advance record',
   expense: 'Farm expense',
   sms: 'SMS to farmer',
   email: 'Email to farmer',

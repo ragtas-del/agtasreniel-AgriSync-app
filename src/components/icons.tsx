@@ -40,7 +40,7 @@ export const IconFarmers = (p: P) => (
   </svg>
 )
 
-export const IconInvest = (p: P) => (
+export const IconCashAdvance = (p: P) => (
   <svg {...base(p)}>
     <path d="M21 12a9 9 0 1 1-3-6.7" />
     <path d="M21 3v6h-6" />

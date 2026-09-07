@@ -113,7 +113,7 @@ export default function FarmerForm() {
                 />
               </div>
             </Field>
-            <Field label="Email address" hint="Used for Gmail investment updates.">
+            <Field label="Email address" hint="Used for Gmail cash advance updates.">
               <input className="input" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="farmer@gmail.com" />
             </Field>
             <Field label="Village">
@@ -122,7 +122,7 @@ export default function FarmerForm() {
             <Field label="City / municipality">
               <input className="input" value={form.district} onChange={(e) => set('district', e.target.value)} placeholder="City or municipality" />
             </Field>
-            <Field label="Farm size (ha)" hint="Used for investment sizing." className="grow">
+            <Field label="Farm size (ha)" hint="Used for cash advance sizing." className="grow">
               <input className="input" type="number" min="0.1" step="0.1" value={form.farmSizeHa} onChange={(e) => set('farmSizeHa', e.target.value)} />
             </Field>
             <Field label="Primary crop">

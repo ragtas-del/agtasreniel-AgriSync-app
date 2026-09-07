@@ -10,7 +10,7 @@ import {
   IconExpense,
   IconFarmers,
   IconHome,
-  IconInvest,
+  IconCashAdvance,
   IconSync,
 } from './icons'
 
@@ -22,7 +22,7 @@ export const NAV_ITEMS: {
 }[] = [
   { to: '/', label: 'Home', icon: IconHome, end: true },
   { to: '/farmers', label: 'Farmers', icon: IconFarmers },
-  { to: '/investments', label: 'Investments', icon: IconInvest },
+  { to: '/cash-advances', label: 'Cash Advances', icon: IconCashAdvance },
   { to: '/expenses', label: 'Expenses', icon: IconExpense },
   { to: '/analytics', label: 'Analytics', icon: IconChart },
   { to: '/sync', label: 'Sync', icon: IconSync },

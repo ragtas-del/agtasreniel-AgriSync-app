@@ -95,7 +95,7 @@ function build(): DB {
 
   const plots: DB['plots'] = []
   const visits: DB['visits'] = []
-  const investments: DB['investments'] = []
+  const cashAdvances: DB['cashAdvances'] = []
   const expenses: DB['expenses'] = []
 
   farmers.forEach((farmer, i) => {
@@ -158,7 +158,7 @@ function build(): DB {
       createdAt: daysAgo(20 + i * 4, 13),
     })
 
-    const kinds: DB['investments'][number]['kind'][] = ['microloan', 'inputs-financing', 'equipment', 'grant']
+    const kinds: DB['cashAdvances'][number]['kind'][] = ['microloan', 'inputs-financing', 'equipment', 'grant']
     const kind = kinds[i % 4]
     const principal = [4800, 2500, 12000, 3000][i % 4]
     const label =
@@ -169,20 +169,20 @@ function build(): DB {
           : kind === 'equipment'
             ? 'Drip irrigation unit'
             : 'Community water access grant'
-    const status: DB['investments'][number]['status'] =
+    const status: DB['cashAdvances'][number]['status'] =
       i === 3 ? 'overdue' : i === 5 ? 'active' : i % 2 ? 'repaid' : 'active'
-    const repayments: DB['investments'][number]['repayments'] = []
+    const repayments: DB['cashAdvances'][number]['repayments'] = []
     const nRepay = status === 'repaid' ? 4 : i === 5 ? 1 : 2
     for (let r = 0; r < nRepay; r++) {
       repayments.push({
         id: `repay-${i + 1}-${r}`,
-        investmentId: `invest-${i + 1}`,
+        cashAdvanceId: `invest-${i + 1}`,
         date: daysAgo(100 - r * 45, 14),
         amount: Math.round((principal / 4) * 10) / 10,
         method: (['mobile-money', 'cash', 'auto-deduct', 'bank-transfer'] as const)[r % 4],
       })
     }
-    investments.push({
+    cashAdvances.push({
       id: `invest-${i + 1}`,
       farmerId: farmer.id,
       kind,
@@ -218,7 +218,7 @@ function build(): DB {
                 id: `sms-${i + 1}-1`,
                 date: daysAgo(2, 17),
                 to: farmer.phone,
-                text: `AgriLedger: reminder — your balance is due. Dial *134# on your phone to check your investment.`,
+                text: `AgriLedger: reminder — your balance is due. Dial *134# on your phone to check your cash advance.`,
               },
             ]
           : [],
@@ -229,8 +229,8 @@ function build(): DB {
                 id: `email-${i + 1}-1`,
                 date: daysAgo(3, 14),
                 to: farmer.email,
-                subject: `Your "${label}" investment update`,
-                body: `Dear ${farmer.name.split(' ')[0]},\n\nYour investment "${label}" — ${principal} total, 50% paid back, due soon. Please review and reply to this email.\n\nAgriLedger`,
+                subject: `Your "${label}" cash advance update`,
+                body: `Dear ${farmer.name.split(' ')[0]},\n\nYour cash advance "${label}" — ${principal} total, 50% paid back, due soon. Please review and reply to this email.\n\nAgriLedger`,
               },
             ]
           : [],
@@ -260,7 +260,7 @@ function build(): DB {
     })
   })
 
-  return { farmers, plots, visits, investments, expenses }
+  return { farmers, plots, visits, cashAdvances, expenses }
 }
 
 export const seed = { agent: AGENT, admin: ADMIN, users: [ADMIN, OPERATOR], db: build() }

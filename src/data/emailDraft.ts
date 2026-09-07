@@ -1,18 +1,18 @@
 import { fmtDate, fmtMoney } from './format'
 import { ussdCode } from './util'
-import type { Farmer, Investment } from '../domain/types'
+import type { Farmer, CashAdvance } from '../domain/types'
 
-export function repaidPct(inv: Investment): number {
+export function repaidPct(inv: CashAdvance): number {
   const paid = inv.repayments.reduce((sum, r) => sum + r.amount, 0)
   return Math.min(100, Math.round((paid / Math.max(1, inv.principal)) * 100))
 }
 
-export function investmentEmailDraft(inv: Investment, farmer: Farmer): { subject: string; body: string } {
+export function cashAdvanceEmailDraft(inv: CashAdvance, farmer: Farmer): { subject: string; body: string } {
   const pct = repaidPct(inv)
-  const subject = `Your "${inv.label}" investment — ${pct}% repaid`
+  const subject = `Your "${inv.label}" cash advance — ${pct}% repaid`
   const body =
     `Dear ${farmer.name},\n\n` +
-    `Here is your AgriLedger investment update:\n\n` +
+    `Here is your AgriLedger cash advance update:\n\n` +
     `  Facility: ${inv.label}\n` +
     `  Amount:    ${fmtMoney(inv.principal)}\n` +
     `  Repaid:    ${pct}%\n` +
