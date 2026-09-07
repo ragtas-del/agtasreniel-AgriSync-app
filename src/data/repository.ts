@@ -1,0 +1,238 @@
+import { getState, setState } from './store'
+import type {
+  ChannelId,
+  EmailRecord,
+  Expense,
+  Farmer,
+  FarmerNote,
+  Investment,
+  OutboxItem,
+  Plot,
+  Repayment,
+  SmsRecord,
+  Visit,
+} from '../domain/types'
+import { uid, isoNow } from './util'
+import { mailConfigured } from './mail'
+import { investmentEmailDraft } from './emailDraft'
+
+function channelFor(entity: OutboxItem['entity'], preferred: ChannelId): ChannelId {
+  if (entity === 'visit' && preferred) return preferred
+  const map: Record<OutboxItem['entity'], ChannelId> = {
+    farmer: 'sms-gateway',
+    plot: 'cloud-api',
+    visit: 'cloud-api',
+    investment: 'ussd-gateway',
+    expense: 'cloud-api',
+    sms: 'sms-gateway',
+    email: 'gmail',
+  }
+  return map[entity]
+}
+
+function enqueue(
+  entity: OutboxItem['entity'],
+  entityId: string,
+  action: OutboxItem['action'],
+  payload: unknown,
+  status: OutboxItem['status'] = 'pending',
+): OutboxItem {
+  const item: OutboxItem = {
+    id: uid('obx'),
+    entity,
+    entityId,
+    action,
+    payload,
+    status,
+    channel: channelFor(entity, getState().settings.preferredChannel),
+    attempts: 0,
+    createdAt: isoNow(),
+  }
+  setState((s) => ({ outbox: [item, ...s.outbox] }))
+  return item
+}
+
+export function createFarmer(
+  data: Omit<Farmer, 'id' | 'agentId' | 'sourceChannel' | 'createdAt' | 'updatedAt'>,
+): Farmer {
+  const now = isoNow()
+  const farmer: Farmer = {
+    ...data,
+    id: uid('farmer'),
+    agentId: 'agent-01',
+    sourceChannel: 'cloud-api',
+    createdAt: now,
+    updatedAt: now,
+  }
+  setState((s) => ({ db: { ...s.db, farmers: [farmer, ...s.db.farmers] } }))
+  enqueue('farmer', farmer.id, 'create', farmer)
+  return farmer
+}
+
+export function updateFarmer(id: string, patch: Partial<Omit<Farmer, 'id' | 'createdAt'>>): void {
+  const farmer = getState().db.farmers.find((f) => f.id === id)
+  if (!farmer) return
+  const updated: Farmer = { ...farmer, ...patch, updatedAt: isoNow() }
+  setState((s) => ({
+    db: { ...s.db, farmers: s.db.farmers.map((f) => (f.id === id ? updated : f)) },
+  }))
+  enqueue('farmer', id, 'update', updated)
+}
+
+export function deleteFarmer(id: string): void {
+  const farmer = getState().db.farmers.find((f) => f.id === id)
+  if (!farmer) return
+  setState((s) => ({
+    db: {
+      farmers: s.db.farmers.filter((f) => f.id !== id),
+      plots: s.db.plots.filter((p) => p.farmerId !== id),
+      visits: s.db.visits.filter((v) => v.farmerId !== id),
+      investments: s.db.investments.filter((i) => i.farmerId !== id),
+      expenses: s.db.expenses.filter((e) => e.farmerId !== id),
+    },
+  }))
+  enqueue('farmer', id, 'delete', { id, name: farmer.name })
+}
+
+export function createPlot(
+  data: Omit<Plot, 'id'>,
+  opts?: { quiet?: boolean },
+): Plot {
+  const plot: Plot = { ...data, id: uid('plot') }
+  setState((s) => ({ db: { ...s.db, plots: [plot, ...s.db.plots] } }))
+  if (!opts?.quiet) enqueue('plot', plot.id, 'create', plot)
+  return plot
+}
+
+export function createVisit(
+  data: Omit<Visit, 'id' | 'agentId' | 'offline' | 'createdAt'>,
+): Visit {
+  const visit: Visit = {
+    ...data,
+    id: uid('visit'),
+    agentId: 'agent-01',
+    offline: !getState().online,
+    createdAt: isoNow(),
+  }
+  setState((s) => ({ db: { ...s.db, visits: [visit, ...s.db.visits] } }))
+  enqueue('visit', visit.id, 'create', visit)
+  return visit
+}
+
+export function createInvestment(
+  data: Omit<Investment, 'id' | 'repayments' | 'farmerMessages' | 'sms' | 'createdAt' | 'status'> & {
+    status?: Investment['status']
+    initialMessage?: string
+  },
+): Investment {
+  const investment: Investment = {
+    ...data,
+    id: uid('invest'),
+    status: data.status ?? 'active',
+    repayments: [],
+    farmerMessages: data.initialMessage?.trim()
+      ? [{ id: uid('note'), date: isoNow(), text: data.initialMessage.trim() }]
+      : [],
+    sms: [],
+    emails: [],
+    createdAt: isoNow(),
+  }
+  setState((s) => ({ db: { ...s.db, investments: [investment, ...s.db.investments] } }))
+  enqueue('investment', investment.id, 'create', investment)
+  return investment
+}
+
+export function addFarmerMessage(investmentId: string, text: string): void {
+  const inv = getState().db.investments.find((i) => i.id === investmentId)
+  if (!inv || !text.trim()) return
+  const note: FarmerNote = { id: uid('note'), date: isoNow(), text: text.trim() }
+  const updated: Investment = {
+    ...inv,
+    farmerMessages: [...(inv.farmerMessages ?? []), note],
+  }
+  setState((s) => ({
+    db: { ...s.db, investments: s.db.investments.map((i) => (i.id === investmentId ? updated : i)) },
+  }))
+  enqueue('investment', investmentId, 'update', updated)
+}
+
+export function notifyFarmer(investmentId: string, to: string, text: string): SmsRecord | null {
+  const inv = getState().db.investments.find((i) => i.id === investmentId)
+  if (!inv || !text.trim() || !to.trim()) return null
+  const record: SmsRecord = { id: uid('sms'), date: isoNow(), to: to.trim(), text: text.trim() }
+  const updated: Investment = {
+    ...inv,
+    sms: [...(inv.sms ?? []), record],
+  }
+  setState((s) => ({
+    db: { ...s.db, investments: s.db.investments.map((i) => (i.id === investmentId ? updated : i)) },
+  }))
+  enqueue('sms', investmentId, 'notify', { recipient: record.to, text: record.text, investmentId })
+  return record
+}
+
+export function sendInvestmentEmail(
+  investmentId: string,
+  to: string,
+  subject: string,
+  body: string,
+): EmailRecord | null {
+  const inv = getState().db.investments.find((i) => i.id === investmentId)
+  if (!inv || !to.trim() || !subject.trim() || !body.trim()) return null
+  const record: EmailRecord = {
+    id: uid('email'),
+    date: isoNow(),
+    to: to.trim(),
+    subject: subject.trim(),
+    body: body.trim(),
+  }
+  const updated: Investment = {
+    ...inv,
+    emails: [...(inv.emails ?? []), record],
+  }
+  setState((s) => ({
+    db: { ...s.db, investments: s.db.investments.map((i) => (i.id === investmentId ? updated : i)) },
+  }))
+  enqueue('email', investmentId, 'notify', { recipient: record.to, subject: record.subject, body: record.body, investmentId })
+  return record
+}
+
+export function addRepayment(investmentId: string, data: Omit<Repayment, 'id' | 'investmentId'>): void {
+  const inv = getState().db.investments.find((i) => i.id === investmentId)
+  if (!inv) return
+  const repayment: Repayment = { ...data, id: uid('repay'), investmentId }
+  const paid = totalRepaid(inv) + repayment.amount
+  const updated: Investment = {
+    ...inv,
+    repayments: [...inv.repayments, repayment],
+    status: paid >= inv.principal ? 'repaid' : inv.status,
+  }
+  setState((s) => ({
+    db: { ...s.db, investments: s.db.investments.map((i) => (i.id === investmentId ? updated : i)) },
+  }))
+  enqueue('investment', investmentId, 'update', updated)
+  autoEmailStatusUpdate(updated)
+}
+
+function autoEmailStatusUpdate(inv: Investment): void {
+  if (!mailConfigured(getState().settings.mail)) return
+  const farmer = getState().db.farmers.find((f) => f.id === inv.farmerId)
+  if (!farmer?.email) return
+  const { subject, body } = investmentEmailDraft(inv, farmer)
+  sendInvestmentEmail(inv.id, farmer.email, subject, body)
+}
+
+export function totalRepaid(inv: Investment): number {
+  return inv.repayments.reduce((sum, r) => sum + r.amount, 0)
+}
+
+export function createExpense(data: Omit<Expense, 'id' | 'createdAt'>): Expense {
+  const expense: Expense = {
+    ...data,
+    id: uid('expense'),
+    createdAt: isoNow(),
+  }
+  setState((s) => ({ db: { ...s.db, expenses: [expense, ...s.db.expenses] } }))
+  enqueue('expense', expense.id, 'create', expense)
+  return expense
+}
