@@ -1096,6 +1096,26 @@
     height: 38px;
     padding: 0;
   }
+  .topbar-actions {
+    gap: 8px;
+  }
+  .topbar-actions .chip {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    justify-content: center;
+  }
+  .topbar-actions .chip .dot {
+    margin: 0;
+  }
+  .topbar-actions .btn > span {
+    display: none;
+  }
+  .topbar-actions .btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+  }
 }
 
 .login-screen {
