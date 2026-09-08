@@ -10,6 +10,7 @@ import {
   IconExpense,
   IconFarmers,
   IconHome,
+  IconLogout,
   IconCashAdvance,
   IconSync,
 } from './icons'
@@ -102,8 +103,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span style={{ display: 'grid' }}>
               <Avatar initials={initials} size={38} />
             </span>
-            <button className="btn btn-ghost btn-sm" onClick={logout} title="Sign out">
-              Sign out
+            <button className="btn btn-ghost btn-sm logout-btn" onClick={logout} title="Sign out">
+              <IconLogout width={16} height={16} />
+              <span className="logout-label">Sign out</span>
             </button>
           </div>
         </div>

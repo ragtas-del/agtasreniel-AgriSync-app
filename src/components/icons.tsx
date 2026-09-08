@@ -218,6 +218,14 @@ export const IconDownload = (p: P) => (
   </svg>
 )
 
+export const IconLogout = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3" />
+    <path d="M16 17l5-5-5-5" />
+    <path d="M21 12H9" />
+  </svg>
+)
+
 export const IconExpense = (p: P) => (
   <svg {...base(p)}>
     <path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
