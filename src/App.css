@@ -169,6 +169,18 @@
   color: var(--brand);
 }
 
+.bottomnav .bn-item.bn-signout {
+  background: none;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--red);
+}
+.bottomnav .bn-item.bn-signout:hover {
+  background: var(--red-soft);
+}
+
 .bottomnav .bn-item .bn-dot {
   position: absolute;
   top: 6px;

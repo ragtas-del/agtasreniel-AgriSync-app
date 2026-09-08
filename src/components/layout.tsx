@@ -129,6 +129,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             {to === '/sync' && pending > 0 && <span className="bn-dot">{pending}</span>}
           </NavLink>
         ))}
+        <button className="bn-item bn-signout" onClick={logout} aria-label="Sign out">
+          <IconLogout width={22} height={22} />
+          Sign out
+        </button>
       </nav>
 
       {pending > 0 && !fatal && (
