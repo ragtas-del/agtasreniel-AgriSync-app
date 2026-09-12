@@ -12,7 +12,7 @@ export function cashAdvanceEmailDraft(inv: CashAdvance, farmer: Farmer): { subje
   const subject = `Your "${inv.label}" cash advance — ${pct}% repaid`
   const body =
     `Dear ${farmer.name},\n\n` +
-    `Here is your AgriLedger cash advance update:\n\n` +
+    `Here is your Rice Farm Expenses cash advance update:\n\n` +
     `  Facility: ${inv.label}\n` +
     `  Amount:    ${fmtMoney(inv.principal)}\n` +
     `  Repaid:    ${pct}%\n` +

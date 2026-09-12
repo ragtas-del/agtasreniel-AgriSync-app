@@ -357,7 +357,7 @@ function openMailApp(to: string, subject: string, body: string): void {
 
 function smsDraft(inv: CashAdvance, farmer: Farmer, code: string): string {
   const pct = Math.min(100, Math.round((totalRepaid(inv) / Math.max(1, inv.principal)) * 100))
-  return `AgriLedger: ${farmer.name.split(' ')[0]}, your "${inv.label}" — ${fmtMoney(inv.principal)} total, ${pct}% paid back, due ${fmtDate(inv.dueDate)}. Dial ${code} on your phone to check.`
+  return `Rice Farm Expenses: ${farmer.name.split(' ')[0]}, your "${inv.label}" — ${fmtMoney(inv.principal)} total, ${pct}% paid back, due ${fmtDate(inv.dueDate)}. Dial ${code} on your phone to check.`
 }
 
 function Stat({ label, value, sub }: { label: string; value: ReactNode; sub: string }) {

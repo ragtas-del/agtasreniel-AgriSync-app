@@ -42,13 +42,13 @@ export default function Login() {
             </svg>
           </span>
           <div>
-            <div className="brand-name">AgriLedger</div>
-            <div className="brand-sub">Farm Financial Ledger &amp; Reporting</div>
+            <div className="brand-name">Rice Farm Expenses</div>
+            <div className="brand-sub">Recording &amp; Monitoring System</div>
           </div>
         </div>
 
-        <h1 className="login-title">Farmer Administrator login</h1>
-        <p className="login-sub">Sign in to manage the farm ledger, cash advances, expenses and reports.</p>
+        <h1 className="login-title">Administrator login</h1>
+        <p className="login-sub">Sign in to record and monitor rice farm expenses, cash advances and reports.</p>
 
         <form onSubmit={handleSubmit} noValidate>
           <Field label="Username">

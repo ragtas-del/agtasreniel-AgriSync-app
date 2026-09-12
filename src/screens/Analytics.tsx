@@ -107,7 +107,7 @@ export default function Analytics() {
       </div>
       <div className="card">
         <p className="text-sm text-mute">
-          All figures are computed locally from the AgriLedger data snapshot on this device
+          All figures are computed locally from the on-device data snapshot
           ({lastSync ? `last synced ${lastSync.slice(0, 10)}` : 'not synced yet'}). Because aggregation runs on-device,
           this dashboard stays fully usable without a connection — field intelligence, not just records.
         </p>

@@ -52,7 +52,7 @@ export default function Dashboard() {
     <>
       <div className="page-header">
         <div>
-          <div className="crumb">Farmer Administrator Console · {m.farmers} farmers enrolled</div>
+          <div className="crumb">Rice Farm Expenses · {m.farmers} farmers enrolled</div>
           <h1 className="mt-2">{greeting()}, {displayName.split(' ')[0]}</h1>
         </div>
         <div className="flex gap-sm">

@@ -1,11 +1,28 @@
 # Mini Capstone Proposal
 
-## AgriLedger: An Offline-First Digital Financial Ledger and Reporting System for Farmers
+## Rice Farm Expense Recording and Monitoring System
 
 **Program:** Bachelor of Science in Information Technology
 **Course:** Mini Capstone
-**Proponent:** ______________________
-**Proposed Title (short form):** *AgriLedger — Farmer Administrator Financial Ledger with Multi-Channel Sync*
+**Proponent:** Reniel B. Agtas & Kurt Ivan Samillano
+**Student ID:** 2023-351
+**Proposed Title (short form):** *Rice Farm Expense Recording and Monitoring System*
+**Date:** September 9, 2026
+**Advisor/Instructor:** Daffodelle V. Lucena
+
+---
+
+## Abstract
+
+Rice Farm Expenses is an offline-first, PWA-ready field console for agricultural extension workers who operate in
+low-connectivity rural areas. The system captures farmer profiles, plot assessments, field visits, investments,
+repayments, and farm-operating expenses entirely on-device, aggregates analytics from the local snapshot, and
+queues every change in an **outbox** for later delivery to head office. Synchronization is resilient by design:
+records are routed over multiple channels (Cloud API, SMS, USSD, email) with realistic latency, retries, and
+failure simulation, and a queued record is only dropped if the user chooses to discard it. The proposal
+describes the problem, objectives, scope, methodology, evaluation, and expected outputs of the system, and
+argues that local-first data capture plus multi-channel delivery materially improves the timeliness,
+completeness, and credibility of field-based financial and farm-cost data.
 
 ---
 
@@ -25,7 +42,7 @@ all times, so that field work continues normally with zero connectivity, and rel
 data to head office once a connection becomes available — through **multiple channels** selected to match
 whatever infrastructure actually exists in the field (cloud API, SMS, USSD, or email rails).
 
-**AgriLedger** is proposed as a solution to this problem: a mobile-ready, offline-first field agent console that
+**Rice Farm Expenses** is proposed as a solution to this problem: a mobile-ready, offline-first field agent console that
 combines on-device data capture (farmers, plots, visits, investments, and farm expenses), local analytics,
 expense reporting, and a resilient multi-channel synchronization engine.
 
@@ -52,27 +69,28 @@ conditions?*
 
 ---
 
-## 3. Objectives
+## 3. Project Objectives & Scope
 
-### General Objective
-To design and develop **AgriLedger**, an offline-first, PWA-ready field agent console for agricultural extension
-workers that captures farmer and farm-records data on-device, aggregates analytics locally, tracks farm
-expenses, and synchronizes records to head office through multiple channels.
+### Main Objectives
+1. **OBJ 1 — Offline-first field data layer:** Capture farmer, plot, visit, investment, and farm-expense
+   records entirely on-device (persistent local store), so field work continues normally with zero connectivity
+   and no data is lost.
+2. **OBJ 2 — Multi-channel synchronization engine:** Queue every local change in an outbox and deliver it to
+   head office over multiple rails (Cloud API, SMS, USSD, email) with automatic retry and sync on reconnect,
+   so records reliably reach head office even when any single channel is down.
+3. **OBJ 3 — On-device analytics & reporting:** Compute dashboards, credit-risk summaries, and farm-cost
+   reports (with downloadable CSV expense ledgers) directly from the local snapshot, keeping financial and
+   cost decisions usable offline.
 
-### Specific Objectives
-1. **SO1 — Local-first data layer:** Design a reactive, persistent data store (localStorage-backed with a
-   typed domain model) so all create/update/read operations — including expense recording — work fully offline.
-2. **SO2 — Multi-channel synchronization engine:** Implement an outbox pattern that queues local changes and
-   delivers them via multiple channels (Cloud API, SMS Gateway, USSD Gateway, and email), with per-channel
-   latency, retry, realistic failure simulation, and automatic sync on reconnect.
-3. **SO3 — On-device analytics:** Build local aggregation selectors that compute dashboards and charts
-   (farmer counts, plots, visits, investment & credit-risk summaries) entirely from the on-device snapshot.
-4. **SO4 — Farm expense management:** Add farmer-linked expense capture (category, amount, date, description),
-   a searchable/filterable records ledger, per-category cost breakdowns, and a downloadable expense report.
-5. **SO5 — Usable field console:** Develop a clean, mobile-first PWA interface with farmer/plot/visit
-   management, investment tracking, expense records, a sync center, and settings — installable and functional offline.
-6. **SO6 — Documentation & evaluation:** Document the architecture and evaluate the system against usability,
-   offline resilience, and sync delivery/retry behavior.
+### Scope
+**In scope:** an offline-first, installable PWA (Vite + React + TypeScript) covering farmer/plot/visit
+management, microloan & repayment tracking, farm-expense capture and reporting, local analytics, and a
+simulated multi-channel sync engine with a delivery audit trail.
+
+### Delimitation (boundaries)
+- The sync engine is **simulated** (no real production backend, SMS/USSD carrier, or live server).
+- No real financial processing, banking, or regulatory compliance handling.
+- Single-agent, single-device scope; multi-device conflict resolution is not implemented.
 
 ---
 
@@ -120,26 +138,45 @@ expenses, and synchronizes records to head office through multiple channels.
 
 ## 6. Review of Related Literature and Technology
 
-> *(The student should expand this section with 4–6 cited sources. Placeholder survey below.)*
+- **Offline-first / local-first software.** Kleppmann et al. (2019) formalize local-first software as software
+  that reads and writes primarily on the user's own device and synchronizes asynchronously, so that the local
+  copy remains authoritative and the tool keeps functioning without connectivity [1]. Rice Farm Expenses applies this
+  idea directly: all reads and writes hit a persistent on-device store, and synchronization happens
+  opportunistically.
+- **Transactional outbox pattern.** Richardson (2019) describes the transactional outbox, in which a write is
+  persisted to a database together with an "outbox" record, and a separate relay later publishes the record —
+  guaranteeing that no change is lost even when the transport is down [2]. Rice Farm Expenses's sync engine adapts this
+  pattern, treating each local mutation as an `OutboxItem` that is only marked *synced* once a channel confirms
+  delivery.
+- **Rural data collection platforms.** Hartung et al. (2010) show, through Open Data Kit (ODK), that offline
+  mobile data capture is both feasible and transformative in developing regions [3]. Rice Farm Expenses extends this
+  pioneer's insight from a one-shot survey tool into an always-on field-management, expense-tracking, and
+  synchronization console.
+- **Multi-channel delivery.** Routing the same logical record over the most appropriate available transport
+  (HTTP/REST, SMS, USSD, or email) is a widely used strategy in low-connectivity settings — the same principle
+  behind mobile-money and IVR-based field data platforms. Rice Farm Expenses demonstrates this by mapping entity types
+  to channels and simulating each one's latency and failure behavior.
+- **PWA / service workers.** Ater (2017) documents how service workers and installable manifests enable
+  application shells to load and run offline [4]. Rice Farm Expenses uses a service worker to precache its shell and
+  bundle its fonts so offline operation works out of the box.
 
-- **Offline-first / local-first software:** Principles that applications should read and write on the device
-  and synchronize asynchronously, prioritizing the local copy (Kleppmann et al., local-first software).
-- **Outbox pattern:** A reliable-messaging idiom in which writes are first persisted alongside an outbox
-  record and later published asynchronously, ensuring no data is lost even if the transport fails.
-- **Multi-channel delivery:** Routing the same logical record type over the most appropriate available
-  transport (HTTP/REST, SMS, USSD) to reach institutions in low-connectivity regions — akin to approaches
-  used by mobile-money and IVR-based data collection platforms.
-- **PWA / service workers:** Enabling installation and offline caching of application shells (used by
-  AgriLedger for offline operation out of the box).
-- **Rural data collection platforms:** Survey tools (e.g., ODK-like) that pioneered offline mobile data
-  capture; AgriLedger extends this into an always-on field management, cost-tracking, and synchronization
-  console rather than a one-shot survey tool.
+**References**
+
+1. Kleppmann, M., Wiggins, A., van Hardenberg, P., & McGranaghan, M. (2019). Local-First Software: You Own
+   Your Data, in Spite of the Cloud. *Proceedings of the 2019 ACM SIGPLAN International Symposium on New Ideas,
+   New Paradigms, and Reflections on Programming (Onward! 2019)*, 154–178.
+2. Richardson, C. (2019). *Pattern: Transactional Outbox*. microservices.io. Retrieved from
+   https://microservices.io/patterns/data/transactional-outbox.html
+3. Hartung, C., Lerer, A., Anokwa, Y., Tseng, C., Brunette, W., & Borriello, G. (2010). Open Data Kit: Tools to
+   Build Information Services for Developing Regions. *Proceedings of the 4th ACM/IEEE International Conference
+   on Information and Communication Technologies and Development (ICTD '10)*, Article 18.
+4. Ater, T. (2017). *Building Progressive Web Apps*. O'Reilly Media.
 
 ---
 
 ## 7. System Overview (Proposed Design)
 
-AgriLedger is organized around a thin client concept: every screen reads from a single reactive local store and
+Rice Farm Expenses is organized around a thin client concept: every screen reads from a single reactive local store and
 mutates the database through typed repository functions, which automatically enqueue an outbox record.
 
 **Domain model (typed, localized):**
@@ -160,6 +197,31 @@ mutates the database through typed repository functions, which automatically enq
 per-channel delivery simulation → mark synced/failed → write SyncLog → UI updates reactively
 (via useSyncExternalStore).`
 
+**Block diagram (architecture):**
+
+```
+                            ┌───────────────────────────────────────────────┐
+                            │                FIELD AGENT (device)            │
+                            │                                               │
+  ┌─────────────────┐   ┌───▼───────────────┐    ┌────────────────────────┐  │
+  │  UI SCREENS      │   │  LOCAL DATA LAYER  │    │  SYNC ENGINE           │  │
+  │  Login/Farmers/  │──▶│  typed store +      │──▶│  Outbox → per-channel  │  │
+  │  Visits/Invest-  │   │  repository (local- │    │  delivery + retries   │  │
+  │  ments/Expenses/ │   │  Storage persistence)│    └───────┬──────────────┘  │
+  │  Analytics/Sync  │   └────────────────────┘            │                 │
+  └─────────────────┘                                      ▼                 │
+                         ┌──────────────────────────────────────────────┐    │
+                         │       MULTI-CHANNEL DELIVERY (simulated)      │    │
+                         │   Cloud API  │  SMS  │  USSD  │  Email/EmailJS  │    │
+                         └──────────────┬──────────────────────────────────┘    │
+                                        │  (async, latency, ~5–12% failure)     │
+                                        ▼                                        │
+                            ┌─────────────────────────┐                          │
+                            │  HEAD OFFICE            │                          │
+                            │  received → SyncLog     │◀─────────────────────────┘
+                            └─────────────────────────┘
+```
+
 **Sync behavior:** outgoing records are grouped by channel; each delivery simulates realistic latency and a
 failure rate (e.g., 5% cloud API, 12% SMS). Failures remain in the outbox for retry; when connectivity is
 restored, a background auto-sync flushes the queue. Premium Gmail delivery uses EmailJS when keys are
@@ -174,6 +236,7 @@ description), a searchable/filterable ledger with running totals, per-category p
 
 ## 8. Methodology
 
+### Technical Approach
 A straightforward **iterative software-development (prototyping) approach** is proposed for a mini capstone:
 
 1. **Requirements & analysis** — define entities (Agent, Farmer, Plot, Visit, Investment, Expense,
@@ -189,6 +252,22 @@ A straightforward **iterative software-development (prototyping) approach** is p
 The development uses core IT-applied techniques: TypeScript type modeling, a reactive local store
 (`useSyncExternalStore`), the outbox design pattern, async simulation of multi-channel delivery, CSV report
 generation, and PWA service-worker caching.
+
+### Tools & Technologies
+
+| Layer | Tools / Framework | Purpose |
+|---|---|---|
+| Frontend | Vite + React 19 + TypeScript | Build tool, UI framework, typed code |
+| Routing | react-router-dom | Screen navigation |
+| Charts | recharts | On-device analytics charts |
+| Offline/PWA | vite-plugin-pwa + service worker | Installable, works without connection |
+| State | Custom typed store over `localStorage` + `useSyncExternalStore` | Local-first persistence & reactivity |
+| Fonts | @fontsource-variable/inter | Bundled (no CDN, works offline) |
+| Email channel | @emailjs/browser (optional) | Real Gmail delivery demo |
+| Deployment | Vercel / Netlify (free tier) | Hosting the static PWA demo |
+| Editing | VS Code, npm | Development environment |
+
+All tools are free/open-source; the prototype runs with **no hardware** beyond a phone/PC test device.
 
 ---
 
@@ -239,7 +318,7 @@ generation, and PWA service-worker caching.
 
 ## 12. Expected Output / Deliverables
 
-- A working **AgriLedger** web app prototype (offline-first, installable PWA) with farmer, plot, visit,
+- A working **Rice Farm Expenses** web app prototype (offline-first, installable PWA) with farmer, plot, visit,
   investment, and **farm expense** management plus on-device analytics.
 - A **reporting feature** that produces searchable expense ledgers, per-category breakdowns, and downloadable
   CSV reports.
@@ -251,7 +330,7 @@ generation, and PWA service-worker caching.
 
 ## 13. Conclusion
 
-AgriLedger directly addresses a real, underserved problem: capturing and delivering agricultural field,
+Rice Farm Expenses directly addresses a real, underserved problem: capturing and delivering agricultural field,
 farm-investment, and farm-cost data in low-connectivity rural settings. By combining an offline-first data
 layer, the outbox pattern, multi-channel synchronization, and on-device analytics and reporting — including a
 full farm-expense subsystem — it demonstrates how resilient, decision-useful field records can be maintained

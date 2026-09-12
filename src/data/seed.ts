@@ -218,7 +218,7 @@ function build(): DB {
                 id: `sms-${i + 1}-1`,
                 date: daysAgo(2, 17),
                 to: farmer.phone,
-                text: `AgriLedger: reminder — your balance is due. Dial *134# on your phone to check your cash advance.`,
+                text: `Rice Farm Expenses: reminder — your balance is due. Dial *134# on your phone to check your cash advance.`,
               },
             ]
           : [],
@@ -230,7 +230,7 @@ function build(): DB {
                 date: daysAgo(3, 14),
                 to: farmer.email,
                 subject: `Your "${label}" cash advance update`,
-                body: `Dear ${farmer.name.split(' ')[0]},\n\nYour cash advance "${label}" — ${principal} total, 50% paid back, due soon. Please review and reply to this email.\n\nAgriLedger`,
+                body: `Dear ${farmer.name.split(' ')[0]},\n\nYour cash advance "${label}" — ${principal} total, 50% paid back, due soon. Please review and reply to this email.\n\nRice Farm Expenses`,
               },
             ]
           : [],

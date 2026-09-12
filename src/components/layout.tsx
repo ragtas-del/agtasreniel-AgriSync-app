@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <header className="topbar">
         <div className="topbar-inner">
-          <Link to="/" className="brand-mark" aria-label="AgriLedger home">
+          <Link to="/" className="brand-mark" aria-label="Rice Farm Expense Recording and Monitoring System home">
             <span className="brand-glyph">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22 5 19V9l7-3 7 3v10l-7 3Z" />
@@ -79,8 +79,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               </svg>
             </span>
             <span>
-              <span className="brand-name">AgriLedger</span>
-              <span className="brand-sub">Farmer Administrator Console</span>
+              <span className="brand-name">Rice Farm Expenses</span>
+              <span className="brand-sub">Recording &amp; Monitoring System</span>
             </span>
           </Link>
 

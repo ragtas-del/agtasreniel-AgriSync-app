@@ -8,7 +8,7 @@ export const CHANNELS: Record<
   { label: string; short: string; desc: string; latency: [number, number]; failRate: number; tone: string }
 > = {
   'cloud-api': {
-    label: 'AgriLedger Cloud API',
+    label: 'Rice Farm Expenses Cloud API',
     short: 'Cloud API',
     desc: 'REST integration with the central records hub',
     latency: [350, 1100],

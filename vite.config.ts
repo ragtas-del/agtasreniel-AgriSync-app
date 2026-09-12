@@ -19,9 +19,9 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'icons.svg', 'icon-192.svg', 'icon-512.svg', 'maskable-512.svg'],
       manifest: {
         id: '/',
-        name: 'AgriLedger — Farmer Administrator',
-        short_name: 'AgriLedger',
-        description: 'Offline-first farm financial ledger and reporting system for farmers',
+        name: 'Rice Farm Expense Recording and Monitoring System',
+        short_name: 'Rice Farm Expenses',
+        description: 'Offline-first rice farm expense recording and monitoring system',
         theme_color: '#1d4e3b',
         background_color: '#f7f4ee',
         display: 'standalone',

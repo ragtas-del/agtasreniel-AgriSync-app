@@ -1,12 +1,13 @@
-# AgriLedger — Farmer Administrator Console
+# Rice Farm Expense Recording and Monitoring System
 
-**Digital financial ledger and reporting system for farmers.**
+**Digital expense recording and monitoring system for rice farms.**
 
-AgriLedger is an offline-first, PWA-ready financial console for farmer administrators. Administrators capture farmer
-profiles, plots, field assessments, investments, repayments and farm-expense records on-device; everything is queued
-in an **outbox** and delivered to head office through **multiple channels** (Cloud API, SMS gateway, USSD rails)
-whenever a connection is available. Analytics are aggregated locally from the on-device snapshot, so financial and
-credit decisions keep working with zero coverage.
+Rice Farm Expense Recording and Monitoring System is an offline-first, PWA-ready console for rice farm
+administrators. Administrators capture farmer profiles, plots, field assessments, investments, repayments and
+farm-expense records on-device; everything is queued in an **outbox** and delivered to head office through
+**multiple channels** (Cloud API, SMS gateway, USSD rails) whenever a connection is available. Analytics are
+aggregated locally from the on-device snapshot, so expense monitoring and financial decisions keep working with
+zero coverage.
 
 Sectors covered: **Agriculture**, **Financial Inclusion** (credit-risk profiles, microloans, repayments), and
 **Business Systems Integration** (local-first data layer + multi-channel sync engine).
